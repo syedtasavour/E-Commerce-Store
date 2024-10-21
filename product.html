@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - E-Commerce Store</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="bg-light py-3">
+        <nav class="navbar navbar-expand-lg navbar-light container">
+            <a class="navbar-brand" href="index.html">E-Store</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="cart.html">Cart</a></li>
+                    <li class="nav-item"><a class="nav-link" href="wishlist.html">Wishlist</a></li>
+                    <li class="nav-item"><a class="nav-link" href="account.html">Account</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-5">
+        <div id="product-details" class="row">
+            <!-- Product details will be dynamically inserted here using JavaScript -->
+        </div>
+        <section class="product-specifications mt-5">
+            <h2>Specifications</h2>
+            <ul id="product-specs" class="list-group">
+                <!-- Product specifications will be dynamically inserted here -->
+            </ul>
+        </section>
+        <section class="customer-reviews mt-5">
+            <h2>Customer Reviews</h2>
+            <div id="product-reviews" class="list-group">
+                <!-- Customer reviews will be dynamically inserted here -->
+            </div>
+        </section>
+        <section class="related-products mt-5">
+            <h2>Related Products</h2>
+            <div class="related-product-grid row">
+                <!-- Related products will be dynamically inserted here using JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2023 E-Commerce Store. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            if (productId && window.products) {
+                const product = window.products.find(p => p.id == productId);
+                if (product) {
+                    displayProductDetails(product);
+                } else {
+                    displayErrorMessage('Product not found.');
+                }
+            } else {
+                displayErrorMessage('Invalid product ID or product data not available.');
+            }
+        });
+
+        function displayProductDetails(product) {
+            const productDetailsDiv = document.getElementById('product-details');
+            productDetailsDiv.innerHTML = `
+                <div class="col-md-6">
+                    <img src="${product.image}" alt="${product.name}" class="img-fluid">
+                </div>
+                <div class="col-md-6">
+                    <h2>${product.name}</h2>
+                    <p class="text-muted">$${product.price.toFixed(2)}</p>
+                    <p>${product.description}</p>
+                    <p>Rating: ${product.rating} (${product.reviews} reviews)</p>
+                    <p>Status: ${product.stock}</p>
+                    <button class="btn btn-primary" onclick="addToCart(${product.id})">Add to Cart</button>
+                </div>
+            `;
+
+            const productSpecs = document.getElementById('product-specs');
+            productSpecs.innerHTML = product.specifications.map(spec => `<li class="list-group-item">${spec}</li>`).join('');
+
+            const productReviews = document.getElementById('product-reviews');
+            productReviews.innerHTML = product.customerReviews.map(review => `
+                <div class="list-group-item">
+                    <p><strong>${review.user}</strong>: ${review.comment} (${review.rating} stars)</p>
+                </div>
+            `).join('');
+
+            displayRelatedProducts(product.id);
+        }
+
+        function displayErrorMessage(message) {
+            const productDetailsDiv = document.getElementById('product-details');
+            productDetailsDiv.innerHTML = `<p class="alert alert-danger">${message}</p>`;
+        }
+
+        function displayRelatedProducts(currentProductId) {
+            const relatedProductsDiv = document.querySelector('.related-product-grid');
+            const relatedProducts = window.products
+                .filter(p => p.id !== currentProductId)
+                .slice(0, 3);
+
+            relatedProductsDiv.innerHTML = relatedProducts.map(product => `
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <img src="${product.image}" class="card-img-top" alt="${product.name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.name}</h5>
+                            <p class="card-text">$${product.price.toFixed(2)}</p>
+                            <button class="btn btn-primary" onclick="addToCart(${product.id})">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
